@@ -3,7 +3,17 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utility/ApiError.js";
 import { uploadToCloudinary } from "../utility/cloudinary.js";
 
-export const getUser = asynchandler(async (req, res) => {
+
+const generateAccessandRefreshToken = async (userId) => {
+  try {
+    
+  } catch (error) {
+    throw new ApiError(500, "Token generation failed");
+  }
+}
+
+
+const getUser = asynchandler(async (req, res) => {
   const { username, email, fullName, password } = req.body;
   if (!username || !email || !fullName || !password) {
     throw new ApiError(400, "All fields are required");
@@ -33,14 +43,14 @@ export const getUser = asynchandler(async (req, res) => {
   }
 
   const user = await User.create({
-  username,
-  email,
-  fullName,
-  password,
+    username,
+    email,
+    fullName,
+    password,
 
-  avatar: avatarUploadResponse.url,       // STRING
-  coverImage: coverImageUploadResponse?.url,
-});
+    avatar: avatarUploadResponse.url, // STRING
+    coverImage: coverImageUploadResponse?.url,
+  });
 
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -56,3 +66,26 @@ export const getUser = asynchandler(async (req, res) => {
     data: createdUser,
   });
 });
+
+const loginUser = asynchandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  const isMatch = await user.isPasswordMatch(password);
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+  
+
+
+
+
+});
+
+export { getUser, loginUser };
