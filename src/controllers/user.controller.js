@@ -117,4 +117,8 @@ const loggedOut = asynchandler(async (req, res) => {
   );
 })
 
+const refreshAccessToken = asynchandler(async (req, res) => {
+  const incomingRefreshToken = req
+});
+
 export { getUser, loginUser, loggedOut };
